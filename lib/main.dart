@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:piano_looper/screens/records_page.dart';
 import 'package:piano_looper/screens/home_page.dart';
 
 
@@ -27,7 +26,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.green,
           scaffoldBackgroundColor: Colors.white,
       ),
-      home: const MyHomePage(title: 'Piano Looper'),
+      home: const MyHomePage(),
     );
   }
 }
