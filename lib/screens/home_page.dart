@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:piano_looper/utils/styles.dart';
+import 'package:piano_looper/screens/piano_page.dart';
+import 'package:piano_looper/screens/records_page.dart';
 
 class MyHomePage extends StatelessWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
+  const MyHomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
+        title: const Text("Piano Looper"),
       ),
       body: Center(
         child: Column(
@@ -21,11 +22,7 @@ class MyHomePage extends StatelessWidget {
             ),
             Text(
               'Main Menu',
-              style: TextStyle(fontSize: 30,
-                foreground: Paint()
-                  ..style = PaintingStyle.stroke
-                  ..strokeWidth = 2
-                  ..color = Colors.green[700]!,),
+              style: AppTextStyles.mainTitle
             ),
             SizedBox(
               width: 250.0,
@@ -35,13 +32,19 @@ class MyHomePage extends StatelessWidget {
                 children: [
                   FloatingActionButton.extended(
                     onPressed: () {
-
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const PianoPage()),
+                      );
                     },
                     label: const Text('Piano'),
                   ),
                   FloatingActionButton.extended(
                     onPressed: () {
-
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const RecordsPage()),
+                      );
                     },
                     label: const Text('Recordings'),
                   ),

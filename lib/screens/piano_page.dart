@@ -3,20 +3,20 @@ import 'package:flutter/services.dart';
 import 'package:piano_looper/screens/home_page.dart';
 
 
-class RecordsPage extends StatefulWidget {
-  const RecordsPage({super.key});
+class PianoPage extends StatefulWidget {
+  const PianoPage({super.key});
 
   @override
-  State<RecordsPage> createState() => _RecordsPageState();
+  State<PianoPage> createState() => _PianoPageState();
 }
 
-class _RecordsPageState extends State<RecordsPage> {
+class _PianoPageState extends State<PianoPage> {
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Records"),
+        title: const Text("Piano"),
         backgroundColor: Colors.green,
       ),
       body: Center(
@@ -30,4 +30,3 @@ class _RecordsPageState extends State<RecordsPage> {
     );
   }
 }
-
