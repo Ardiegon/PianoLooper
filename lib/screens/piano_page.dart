@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:piano_looper/piano/keybord.dart';
+import 'package:piano_looper/piano/keyboard.dart';
 
 
 
@@ -31,7 +31,7 @@ class _PianoPageState extends State<PianoPage> {
             ),
             Container(
                 margin: const EdgeInsets.all(50.0),
-                child: const PianoKeyboard()
+                child: PianoKeyboard()
             ),
           ],
         )

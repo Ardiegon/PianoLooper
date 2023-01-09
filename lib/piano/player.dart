@@ -1,16 +1,20 @@
-import 'dart:typed_data';
 import 'package:flutter/services.dart';
+// ignore: depend_on_referenced_packages
 import 'package:audioplayers/audioplayers.dart';
 
-const int additionalOffsetCut = 15000;
+const int additionalOffsetCut = 20000;
+const int millisecondsOfSuspend = 230;
 
-playSound(AudioPlayer player, String soundName) async {
-  // return await player.play(BytesSource(SoundsLib().soundBytes[soundName]!));
-  return await player.play(AssetSource('audio/key${SoundsLib.mapSoundsToNumbers[soundName]}.mp3'));
+playSound(AudioPlayer player, SoundsLib lib,  String soundName) async {
+  return await player.play(BytesSource(lib.soundBytes[soundName]!));
+}
+
+stopSoundDelay(AudioPlayer player) async {
+  await Future.delayed(const Duration(milliseconds: millisecondsOfSuspend));
+  await player.stop();
 }
 
 stopSound(AudioPlayer player) async {
-  await Future.delayed(Duration(seconds: 1));
   await player.stop();
 }
 
