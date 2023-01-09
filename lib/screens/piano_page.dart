@@ -20,6 +20,7 @@ class _PianoPageState extends State<PianoPage> {
       ),
       body: Center(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
           children: [
             FloatingActionButton.extended(
             onPressed: () {
@@ -27,7 +28,10 @@ class _PianoPageState extends State<PianoPage> {
             },
             label: const Text('Home'),
             ),
-            const PianoKeybord(),
+            Container(
+                margin: const EdgeInsets.all(50.0),
+                child: const PianoKeyboard()
+            ),
           ],
         )
       ),
