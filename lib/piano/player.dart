@@ -4,9 +4,14 @@ import 'package:audioplayers/audioplayers.dart';
 
 const int additionalOffsetCut = 15000;
 
-playSound(String soundName) async {
-  AudioPlayer player = AudioPlayer();
-  return await player.play(BytesSource(SoundsLib().soundBytes[soundName]!));
+playSound(AudioPlayer player, String soundName) async {
+  // return await player.play(BytesSource(SoundsLib().soundBytes[soundName]!));
+  return await player.play(AssetSource('audio/key${SoundsLib.mapSoundsToNumbers[soundName]}.mp3'));
+}
+
+stopSound(AudioPlayer player) async {
+  await Future.delayed(Duration(seconds: 1));
+  await player.stop();
 }
 
 class SoundsLib{

@@ -1,17 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:piano_looper/piano/player.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 
 class WhitePianoTile extends StatelessWidget {
-  const WhitePianoTile(this.soundName, {super.key});
+  WhitePianoTile(this.soundName, {super.key});
   final String soundName;
+  final AudioPlayer player = AudioPlayer();
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        playSound(soundName);
+      onTapDown: (TapDownDetails details) {
+        playSound(player, soundName);
       },
+      onTapUp: (TapUpDetails details){
+        stopSound(player);
+      },
+
       child: SizedBox(
         width: 100,
         height: 410,
@@ -24,14 +30,18 @@ class WhitePianoTile extends StatelessWidget {
 }
 
 class BlackPianoTile extends StatelessWidget {
-  const BlackPianoTile(this.soundName, {super.key});
+  BlackPianoTile(this.soundName, {super.key});
   final String soundName;
+  final AudioPlayer player = AudioPlayer();
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        playSound(soundName);
+      onTapDown: (TapDownDetails details) {
+        playSound(player, soundName);
+      },
+      onTapUp: (TapUpDetails details){
+        stopSound(player);
       },
       child: SizedBox(
         width: 50,
@@ -70,7 +80,6 @@ class PianoKeyboard extends StatelessWidget{
             margin: EdgeInsets.only(left: additionalLeftMargin, right: spaceBetween),
             child: BlackPianoTile(SoundsLib.blackNamesList[i]),
           )
-
       );
     }
     return list;
