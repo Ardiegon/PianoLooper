@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
+import 'package:piano_looper/piano/player.dart';
 import 'package:piano_looper/screens/home_page.dart';
 
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await SoundsLib.initialize();
   runApp(const MyApp());
 }
 

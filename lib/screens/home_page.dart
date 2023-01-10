@@ -21,7 +21,7 @@ class MyHomePage extends StatelessWidget {
                 image: AssetImage('assets/piano.png')
             ),
             Text(
-              'Main Menu',
+              'Piano Looper',
               style: AppTextStyles.mainTitle
             ),
             SizedBox(
@@ -31,15 +31,17 @@ class MyHomePage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   FloatingActionButton.extended(
+                    heroTag: "btn1",
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const PianoPage()),
+                        MaterialPageRoute(builder: (context) => PianoPage()),
                       );
                     },
                     label: const Text('Piano'),
                   ),
                   FloatingActionButton.extended(
+                    heroTag: "btn2",
                     onPressed: () {
                       Navigator.push(
                         context,
