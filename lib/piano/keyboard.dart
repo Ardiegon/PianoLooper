@@ -1,24 +1,41 @@
+// ignore_for_file: depend_on_referenced_packages
+
 import 'package:flutter/material.dart';
 import 'package:piano_looper/piano/player.dart';
 import 'package:audioplayers/audioplayers.dart';
 
 
-class WhitePianoTile extends StatefulWidget {
-  WhitePianoTile(this.soundName, this.lib, {super.key}){
+class PianoTile extends StatefulWidget {
+  PianoTile(this.soundName, this.lib, color, {super.key}){
     player = AudioPlayer();
+    helperPlayer = AudioPlayer();
+    if(color == 'black'){
+      width = 50.0;
+      height = 250.0;
+      assetsImagePath = 'assets/piano_black.png';
+    }
+    else if(color == 'white'){
+      width = 100.0;
+      height = 410.0;
+      assetsImagePath = 'assets/piano_white.png';
+    }
   }
-
   final String soundName;
   final SoundsLib lib;
-  late final AudioPlayer player;
+  late final double width;
+  late final double height;
+  late final String assetsImagePath;
+  late final AudioPlayer player, helperPlayer;
 
   @override
-  State<WhitePianoTile> createState() => _WhitePianoTileState();
+  State<PianoTile> createState() => _PianoTileState();
 
 }
 
-class _WhitePianoTileState extends State<WhitePianoTile>{
+class _PianoTileState extends State<PianoTile>{
   ColorFilter _filter = const ColorFilter.mode(Colors.white, BlendMode.darken);
+  bool _helperNeeded = false;
+
 
   void _keyTapped() {
     setState(() {
@@ -36,25 +53,45 @@ class _WhitePianoTileState extends State<WhitePianoTile>{
   Widget build(BuildContext context) {
     return GestureDetector(
       onTapDown: (TapDownDetails details) {
-        stopSound(widget.player);
-        playSound(widget.player, widget.lib, widget.soundName);
+        if(!_helperNeeded){
+          playSound(widget.player, widget.lib, widget.soundName);
+          _helperNeeded = true;
+        }
+        else{
+          playSound(widget.helperPlayer, widget.lib, widget.soundName);
+          _helperNeeded = false;
+        }
         _keyTapped();
       },
       onTapUp: (TapUpDetails details){
-        stopSoundDelay(widget.player);
+        if(_helperNeeded){
+          stopSound(widget.helperPlayer);
+          stopSoundDelay(widget.player);
+        }
+        else{
+          stopSound(widget.player);
+          stopSoundDelay(widget.helperPlayer);
+        }
         _keyReleased();
       },
       onTapCancel: (){
-        stopSoundDelay(widget.player);
+        if(_helperNeeded){
+          stopSound(widget.helperPlayer);
+          stopSoundDelay(widget.player);
+        }
+        else{
+          stopSound(widget.player);
+          stopSoundDelay(widget.helperPlayer);
+        }
         _keyReleased();
       },
       child: SizedBox(
-        width: 100,
-        height: 410,
+        width: widget.width,
+        height: widget.height,
         child: ColorFiltered(
           colorFilter: _filter,
           child:Image.asset(
-            'assets/piano_white.png',
+            widget.assetsImagePath,
             fit: BoxFit.cover,
           ),
         ),
@@ -63,65 +100,6 @@ class _WhitePianoTileState extends State<WhitePianoTile>{
   }
 }
 
-class BlackPianoTile extends StatefulWidget {
-  BlackPianoTile(this.soundName, this.lib, {super.key}){
-    player = AudioPlayer();
-  }
-
-  final String soundName;
-  final SoundsLib lib;
-  late final AudioPlayer player;
-
-
-  @override
-  State<BlackPianoTile> createState() => _BlackPianoTileState();
-}
-
-class _BlackPianoTileState extends State<BlackPianoTile>{
-  ColorFilter _filter = const ColorFilter.mode(Colors.white, BlendMode.modulate);
-
-  void _keyTapped() {
-    setState(() {
-      _filter = const ColorFilter.mode(Colors.black87, BlendMode.modulate);
-    });
-  }
-
-  void _keyReleased() {
-    setState(() {
-      _filter = const ColorFilter.mode(Colors.white, BlendMode.modulate);
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: (TapDownDetails details) {
-        stopSound(widget.player);
-        playSound(widget.player, widget.lib, widget.soundName);
-        _keyTapped();
-      },
-      onTapUp: (TapUpDetails details){
-        stopSoundDelay(widget.player);
-        _keyReleased();
-      },
-      onTapCancel: (){
-        stopSoundDelay(widget.player);
-        _keyReleased();
-      },
-      child: SizedBox(
-        width: 50,
-        height: 250,
-        child: ColorFiltered(
-          colorFilter: _filter,
-          child:Image.asset(
-            'assets/piano_black.png',
-            fit: BoxFit.cover,
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 class PianoKeyboard extends StatelessWidget{
   PianoKeyboard({super.key});
@@ -130,7 +108,7 @@ class PianoKeyboard extends StatelessWidget{
   List<Widget> gatherWhiteTiles(){
     List<Widget> list = [];
     for (var element in SoundsLib.whiteNamesList) {
-      list.add(WhitePianoTile(element, lib));
+      list.add(PianoTile(element, lib, 'white'));
     }
     return list;
   }
@@ -148,7 +126,7 @@ class PianoKeyboard extends StatelessWidget{
       list.add(
           Container(
             margin: EdgeInsets.only(left: additionalLeftMargin, right: spaceBetween),
-            child: BlackPianoTile(SoundsLib.blackNamesList[i], lib),
+            child: PianoTile(SoundsLib.blackNamesList[i], lib, 'black'),
           )
       );
     }
