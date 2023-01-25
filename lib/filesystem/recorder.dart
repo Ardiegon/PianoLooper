@@ -15,10 +15,19 @@ class Recording{
   Recording();
   List<Sound> recordingData = [];
 
+  static Recording fromJson(Map source){
+    Recording rec = Recording();
+
+    for(var v in source.values){
+      rec.add(Sound(v["sound_id"], v["time_stamp"], v["duration"]));
+    }
+    return rec;
+  }
+
   Map toJson() {
-    Map<int, Map> jsonBuffor = {};
+    Map<String, Map> jsonBuffor = {};
     for(var i=0; i < recordingData.length; i++){
-      jsonBuffor.putIfAbsent(i, () => recordingData[i].toJson());
+      jsonBuffor.putIfAbsent('$i', () => recordingData[i].toJson());
     }
     return jsonBuffor;
   }

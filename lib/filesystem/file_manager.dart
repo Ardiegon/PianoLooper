@@ -1,28 +1,31 @@
 import 'package:path_provider/path_provider.dart';
 import 'dart:io' as io;
+import 'dart:convert';
+
+import 'package:piano_looper/filesystem/recorder.dart';
 
 
 
-Future<String> get _localPath async {
+Future<String> _localPath() async {
   final directory = await getApplicationDocumentsDirectory();
   return directory.path;
 }
 
-Future<io.File> get _localFile async {
-  final path = await _localPath;
-  return io.File('$path/Message.txt');
+Future<io.File> _localFile(String name) async {
+  final path = await _localPath();
+  return io.File('$path/$name.txt');
 }
 
-Future<io.File> writeBytes(List<int> data) async {
-  final file = await _localFile;
+Future<io.File> fsWriteBytes(List<int> data, {String name = "bytes"}) async {
+  final file = await _localFile(name);
 
   // Write the file
   return file.writeAsBytes(data);
 }
 
-Future<List<int>> readBytes() async {
+Future<List<int>> fsReadBytes({String name = "bytes"}) async {
   try {
-    final file = await _localFile;
+    final file = await _localFile(name);
 
     // Read the file
     final contents = await file.readAsBytes();
@@ -34,15 +37,25 @@ Future<List<int>> readBytes() async {
   }
 }
 
-Future<io.File> fs_write(String message) async {
-  final file = await _localFile;
+Future<io.File> fsWriteRecording(Recording message, {String name = "recording"}) async {
+  const JsonEncoder encoder = JsonEncoder();
+  String encoded = encoder.convert(message.toJson());
+  return fsWriteString(encoded, name: name);
+}
 
+Future<Map> fsReadRecording({String name = "recording"}) async {
+  String source = await fsReadString(name: name);
+  return jsonDecode(source);
+}
+
+Future<io.File> fsWriteString(String message, {String name = "messages"}) async {
+  final file = await _localFile(name);
   return file.writeAsString(message);
 }
 
-Future<String> fs_read() async {
+Future<String> fsReadString({String name = "messages"}) async {
   try {
-    final file = await _localFile;
+    final file = await _localFile(name);
 
     // Read the file
     final contents = await file.readAsString();
