@@ -1,14 +1,20 @@
 // ignore_for_file: depend_on_referenced_packages
 
 import 'package:flutter/material.dart';
+import 'package:piano_looper/filesystem/recorder.dart';
 import 'package:piano_looper/piano/player.dart';
 import 'package:audioplayers/audioplayers.dart';
 
 
 class PianoTile extends StatefulWidget {
-  PianoTile(this.soundName, this.lib, color, {super.key}){
+  PianoTile(this.soundName, this.lib, color, is_recording, rec, watch, {super.key}){
     player = AudioPlayer();
     helperPlayer = AudioPlayer();
+    soundCreator = SoundCreator();
+    helperSoundCreator = SoundCreator();
+    stopwatch = watch;
+    isRecording = is_recording;
+    recording = rec;
     if(color == 'black'){
       width = 50.0;
       height = 250.0;
@@ -20,6 +26,11 @@ class PianoTile extends StatefulWidget {
       assetsImagePath = 'assets/piano_white.png';
     }
   }
+  late Recording recording;
+  late Stopwatch stopwatch;
+  late bool isRecording;
+  late final SoundCreator soundCreator;
+  late final SoundCreator helperSoundCreator;
   final String soundName;
   final SoundsLib lib;
   late final double width;
@@ -55,11 +66,21 @@ class _PianoTileState extends State<PianoTile>{
       onTapDown: (TapDownDetails details) {
         if(!_helperNeeded){
           playSound(widget.player, widget.lib, widget.soundName);
+          if(widget.isRecording) {
+            widget.soundCreator.soundId = widget.soundName;
+            widget.soundCreator.timeStamp =
+                widget.stopwatch.elapsedMilliseconds;
+          }
           _helperNeeded = true;
         }
         else{
           playSound(widget.helperPlayer, widget.lib, widget.soundName);
           _helperNeeded = false;
+          if(widget.isRecording) {
+            widget.helperSoundCreator.soundId = widget.soundName;
+            widget.helperSoundCreator.timeStamp =
+                widget.stopwatch.elapsedMilliseconds;
+          }
         }
         _keyTapped();
       },
@@ -67,10 +88,20 @@ class _PianoTileState extends State<PianoTile>{
         if(_helperNeeded){
           stopSound(widget.helperPlayer);
           stopSoundDelay(widget.player);
+          if(widget.isRecording) {
+            widget.soundCreator.duration = widget.stopwatch.elapsedMilliseconds;
+            widget.recording.add(widget.soundCreator.build());
+            widget.soundCreator.reset();
+          }
         }
         else{
           stopSound(widget.player);
           stopSoundDelay(widget.helperPlayer);
+          if(widget.isRecording) {
+            widget.helperSoundCreator.duration = widget.stopwatch.elapsedMilliseconds;
+            widget.recording.add(widget.helperSoundCreator.build());
+            widget.helperSoundCreator.reset();
+          }
         }
         _keyReleased();
       },
@@ -78,10 +109,20 @@ class _PianoTileState extends State<PianoTile>{
         if(_helperNeeded){
           stopSound(widget.helperPlayer);
           stopSoundDelay(widget.player);
+          if(widget.isRecording) {
+            widget.soundCreator.duration = widget.stopwatch.elapsedMilliseconds;
+            widget.recording.add(widget.soundCreator.build());
+            widget.soundCreator.reset();
+          }
         }
         else{
           stopSound(widget.player);
           stopSoundDelay(widget.helperPlayer);
+          if(widget.isRecording) {
+            widget.helperSoundCreator.duration = widget.stopwatch.elapsedMilliseconds;
+            widget.recording.add(widget.helperSoundCreator.build());
+            widget.helperSoundCreator.reset();
+          }
         }
         _keyReleased();
       },
@@ -102,13 +143,16 @@ class _PianoTileState extends State<PianoTile>{
 
 
 class PianoKeyboard extends StatelessWidget{
-  PianoKeyboard({super.key});
+  PianoKeyboard(this.isRecording, this.rec, this.watch,{super.key});
   final SoundsLib lib = SoundsLib();
+  bool isRecording;
+  Recording rec;
+  Stopwatch watch;
 
   List<Widget> gatherWhiteTiles(){
     List<Widget> list = [];
     for (var element in SoundsLib.whiteNamesList) {
-      list.add(PianoTile(element, lib, 'white'));
+      list.add(PianoTile(element, lib, 'white', isRecording, rec, watch));
     }
     return list;
   }
@@ -126,7 +170,7 @@ class PianoKeyboard extends StatelessWidget{
       list.add(
           Container(
             margin: EdgeInsets.only(left: additionalLeftMargin, right: spaceBetween),
-            child: PianoTile(SoundsLib.blackNamesList[i], lib, 'black'),
+            child: PianoTile(SoundsLib.blackNamesList[i], lib, 'black', isRecording, rec, watch),
           )
       );
     }

@@ -1,4 +1,5 @@
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/services.dart';
 import 'package:piano_looper/piano/player.dart';
 
 class Sound{
@@ -13,6 +14,50 @@ class Sound{
     'duration': duration,
   };
 }
+
+class SoundCreator{
+  SoundCreator();
+  String _sound_id = "";
+  int _time_stamp = 0;
+  int _duration = 0;
+  bool isIdSet = false;
+  bool isTimeSet = false;
+  bool isDurationSet = false;
+  final int additionalDelay = 230;
+
+  void reset(){
+    _sound_id = "";
+    _time_stamp = 0;
+    _duration = 0;
+    isIdSet = false;
+    isTimeSet = false;
+    isDurationSet = false;
+  }
+
+  void set soundId(String v){
+    _sound_id = v;
+    isIdSet = true;
+  }
+  void set timeStamp(int v){
+    _time_stamp = v;
+    isTimeSet = true;
+  }
+  void set duration(int v){
+    _duration = v - _time_stamp + additionalDelay;
+    isDurationSet = true;
+  }
+
+  Sound build(){
+    if(isIdSet && isTimeSet && isDurationSet){
+      return Sound(_sound_id, _time_stamp, _duration);
+    }
+    else{
+      throw Exception("SoundBuilder had values uninitialized");
+    }
+
+  }
+}
+
 
 class Recording{
   Recording();
@@ -40,17 +85,21 @@ class Recording{
     recordingData.add(value);
     len++;
   }
+
+  int get duration{
+    return recordingData.last.time_stamp + recordingData.last.duration;
+  }
 }
 
 Recording getSampleRecording(){
   Recording rec = Recording();
-  rec.add(Sound('0c', 1000, 4000));
-  rec.add(Sound('0e', 1000, 4000));
-  rec.add(Sound('0g', 1000, 4000));
-  rec.add(Sound('1c', 3400, 2000));
-  rec.add(Sound('1e', 3800, 2000));
-  rec.add(Sound('1f', 4200, 2000));
-  rec.add(Sound('1g', 4600, 6000));
+  rec.add(Sound('1c', 400, 2000));
+  rec.add(Sound('1e', 800, 2000));
+  rec.add(Sound('1f', 1200, 2000));
+  rec.add(Sound('1g', 1600, 6000));
+  rec.add(Sound('0c', 1600, 4000));
+  rec.add(Sound('0e', 1600, 4000));
+  rec.add(Sound('0g', 1600, 4000));
 
   return rec;
 }
@@ -60,7 +109,7 @@ class RecordPlayer{
   RecordPlayer({numPlayers = 10}){
     final SoundsLib lib = SoundsLib();
     _numPlayers = numPlayers;
-    soundPlayers = List.filled(numPlayers, SoundPlayer(this, lib));
+    soundPlayers = List.generate(numPlayers, (int index) => SoundPlayer(index, this, lib));
     readyPlayers = [];
     for(var v in soundPlayers){
       readyPlayers.add(v);
@@ -113,11 +162,13 @@ class RecordPlayer{
 
 
 class SoundPlayer{
-  SoundPlayer( RecordPlayer rp, SoundsLib lib){
+  SoundPlayer( int index, RecordPlayer rp, SoundsLib lib){
+    playerIndex = index;
     audioPlayer = AudioPlayer();
     recordPlayer = rp;
     soundLib = lib;
   }
+  late final playerIndex;
   late final RecordPlayer recordPlayer;
   late final AudioPlayer audioPlayer;
   late final SoundsLib soundLib;

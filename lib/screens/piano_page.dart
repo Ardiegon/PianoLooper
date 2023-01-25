@@ -6,8 +6,6 @@ import 'package:piano_looper/filesystem/recorder.dart';
 import 'dart:convert';
 
 
-List<Tuple3<int, double, double>> structure = [const Tuple3(1,2.0,2.0), const Tuple3(13,4.0,1.0)];
-
 class PianoPage extends StatefulWidget {
   PianoPage({super.key});
 
@@ -16,6 +14,42 @@ class PianoPage extends StatefulWidget {
 }
 
 class _PianoPageState extends State<PianoPage> {
+   bool isPlayingRecord = false;
+   bool isRecording = false;
+   Recording recording = Recording();
+   Stopwatch watch = Stopwatch();
+   MaterialColor playButtonColor = Colors.green;
+   MaterialColor recordButtonColor = Colors.green;
+
+   void playRecord(Recording record) async{
+     isPlayingRecord = true;
+     RecordPlayer recPlayer = RecordPlayer();
+     recPlayer.play(record);
+   }
+
+   void record(){
+     setState(() {
+       isRecording = true;
+       recordButtonColor = Colors.deepOrange;
+       recording = Recording();
+       watch.reset();
+       watch.start();
+     });
+   }
+
+   void stopRecording(){
+     setState(() {
+       isRecording = false;
+       recordButtonColor = Colors.green;
+       watch.stop();
+     });
+   }
+
+   void changePlayButtonColor(MaterialColor color){
+     setState(() {
+       playButtonColor = color;
+     });;
+   }
 
   @override
   Widget build(BuildContext context) {
@@ -28,45 +62,61 @@ class _PianoPageState extends State<PianoPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-          Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            FloatingActionButton.extended(
-              onPressed: () {
-                print("Record");
-                Recording record = getSampleRecording();
-                print(record.toJson());
-
-                fsWriteRecording(record, name: "rec");
-                fsWriteString("Hello");
-              },
-              label: const Text('Record'),
-            ),
-            FloatingActionButton.extended(
-              onPressed: () {
-                print("Play");
-                () async {
-                  String message = await fsReadString();
-                  Map json = await fsReadRecording(name: "rec");
-                  Recording record = Recording.fromJson(json);
-                  print(record.toJson());
-                  print(message);
-                  RecordPlayer recPlayer = RecordPlayer();
-                  recPlayer.play(record);
-                } ();
-              },
-              label: const Text('Play'),
-            ),
-          ]),
             FloatingActionButton.extended(
             onPressed: () {
               Navigator.pop(context);
             },
             label: const Text('Home'),
+          ),
+          Container(
+            height: 50,
+          ),
+          Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+
+            FloatingActionButton.extended(
+              onPressed: () {
+                if(!isRecording){
+                  record();
+                }
+                else{
+                  stopRecording();
+                  print(recording.toJson());
+                  fsWriteRecording(recording, name: "rec");
+                }
+
+              },
+              label: const Text('Record'),
             ),
+            FloatingActionButton.extended(
+              backgroundColor: playButtonColor,
+              onPressed: () {
+                if(!isPlayingRecord) {
+                  print("Play");
+                  changePlayButtonColor(Colors.deepOrange);
+                      () async {
+                    Map json = await fsReadRecording(name: "rec");
+                    Recording record = Recording.fromJson(json);
+                    playRecord(record);
+                    await Future.delayed(Duration(milliseconds: record
+                        .duration));
+                    changePlayButtonColor(Colors.green);
+                    isPlayingRecord = false;
+                  }();
+                }
+              },
+              label: const Text('Play'),
+            ),
+            FloatingActionButton.extended(
+              onPressed: () {
+              },
+              label: const Text('Save'),
+            ),
+          ]),
             Container(
                 margin: const EdgeInsets.all(50.0),
-                child: PianoKeyboard()
+                child: PianoKeyboard(isRecording, recording, watch)
             ),
           ],
         )
