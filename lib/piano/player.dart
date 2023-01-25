@@ -3,14 +3,13 @@ import 'package:flutter/services.dart';
 import 'package:audioplayers/audioplayers.dart';
 
 const int additionalOffsetCut = 20000;
-const int millisecondsOfSuspend = 230;
 
 playSound(AudioPlayer player, SoundsLib lib,  String soundName) async {
   return await player.play(BytesSource(lib.soundBytes[soundName]!));
 }
 
-stopSoundDelay(AudioPlayer player) async {
-  await Future.delayed(const Duration(milliseconds: millisecondsOfSuspend));
+stopSoundDelay(AudioPlayer player, {int delay = 230}) async {
+  await Future.delayed( Duration(milliseconds: delay));
   await player.stop();
 }
 

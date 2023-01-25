@@ -36,9 +36,6 @@ class _PianoPageState extends State<PianoPage> {
                 print("Record");
                 Recording record = getSampleRecording();
                 print(record.toJson());
-                const JsonEncoder encoder = JsonEncoder();
-                String encoded = encoder.convert(record.toJson());
-                print(encoded);
 
                 fsWriteRecording(record, name: "rec");
                 fsWriteString("Hello");
@@ -54,6 +51,8 @@ class _PianoPageState extends State<PianoPage> {
                   Recording record = Recording.fromJson(json);
                   print(record.toJson());
                   print(message);
+                  RecordPlayer recPlayer = RecordPlayer();
+                  recPlayer.play(record);
                 } ();
               },
               label: const Text('Play'),
