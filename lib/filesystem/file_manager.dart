@@ -60,6 +60,7 @@ Future<io.File> fsWriteRecording(Recording message, {String name = "recording"})
 
 Future<Map> fsReadRecording({String name = "recording"}) async {
   String source = await fsReadString(name: name);
+  print("AAAAs");
   print(source);
   return jsonDecode(source);
 }
@@ -124,7 +125,7 @@ class _FileButtonState extends State<FileButton>{
                     child: const Text('Play',style: TextStyle(fontSize: 10),),
                     onPressed: () {
                       () async {
-                        Map json = await fsReadRecording(name: widget.name);
+                        Map json = await fsReadRecording(name: "saved_"+widget.name);
                         Recording record = Recording.fromJson(json);
                         RecordPlayer recPlayer = RecordPlayer();
                         recPlayer.play(record);
@@ -144,6 +145,9 @@ class _FileButtonState extends State<FileButton>{
                   child: FloatingActionButton(
                     child: const Text('Delete',style: TextStyle(fontSize: 10),),
                     onPressed: () {
+                      () async {
+                        deleteFile("saved_"+widget.name);
+                      } ();
                       setState(() {
                         Navigator.pop(context);
                       });
@@ -156,6 +160,11 @@ class _FileButtonState extends State<FileButton>{
                   child: FloatingActionButton(
                     child: const Text('Activate',style: TextStyle(fontSize: 10),),
                     onPressed: () {
+                      () async {
+                        Map json = await fsReadRecording(name: "saved_"+widget.name);
+                        Recording record = Recording.fromJson(json);
+                        fsWriteRecording(record, name: "rec");
+                      } ();
                       setState(() {
                         Navigator.pop(context);
                       });
