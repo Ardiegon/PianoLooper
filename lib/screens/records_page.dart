@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:piano_looper/screens/home_page.dart';
+import 'package:piano_looper/filesystem/file_manager.dart';
 
 
 class RecordsPage extends StatefulWidget {
@@ -19,15 +20,43 @@ class _RecordsPageState extends State<RecordsPage> {
         title: const Text("Records"),
         backgroundColor: Colors.green,
       ),
-      body: Center(
-        child: FloatingActionButton.extended(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          label: const Text('Home'),
-        ),
-      ),
-    );
-  }
+      body: FutureBuilder<List<Widget>>(
+        future: createFileButtons(),
+        builder: (BuildContext context, AsyncSnapshot<List<Widget>> snapshot) {
+            if (!snapshot.hasData) {
+            // while data is loading:
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+            } else {
+              // data loaded:
+              final widgetList = snapshot.data;
+              return Center(
+                child: ListView(
+                  children: widgetList! + [
+                    Row(mainAxisAlignment:
+                      MainAxisAlignment.spaceEvenly,
+                      children: [
+                        FloatingActionButton.extended(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          label: const Text('Home'),
+                        ),
+                        FloatingActionButton.extended(
+                          backgroundColor: Colors.grey,
+                          onPressed: () {},
+                          label: const Text('Merge'),
+                        ),
+                      ],
+                    ),
+                  ]
+                ),
+              );
+            }
+        },
+      )
+      );
+    }
 }
 
