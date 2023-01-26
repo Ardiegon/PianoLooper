@@ -21,6 +21,48 @@ class _PianoPageState extends State<PianoPage> {
    MaterialColor playButtonColor = Colors.green;
    MaterialColor recordButtonColor = Colors.green;
 
+   TextEditingController _textFieldController = TextEditingController();
+   String saveName = "";
+
+   Future<void> _saveRecordingDialog(BuildContext context) async {
+     return showDialog(
+         context: context,
+         builder: (context) {
+           return AlertDialog(
+             title: Text('Save record as'),
+             content: TextField(
+               onChanged: (value) {
+                 setState(() {
+                   saveName = value;
+                 });
+               },
+               controller: _textFieldController,
+               decoration: InputDecoration(hintText: "record name"),
+             ),
+             actions: <Widget>[
+               FloatingActionButton(
+                 backgroundColor: Colors.deepOrange,
+                 child: Text('Cancel'),
+                 onPressed: () {
+                   setState(() {
+                     Navigator.pop(context);
+                   });
+                 },
+               ),
+               FloatingActionButton(
+                 child: Text('Save'),
+                 onPressed: () {
+                   setState(() {
+                     fsWriteRecording(recording, name: "saved_" + saveName);
+                     Navigator.pop(context);
+                   });
+                 },
+               ),
+             ],
+           );
+         });
+   }
+
    void playRecord(Recording record) async{
      isPlayingRecord = true;
      RecordPlayer recPlayer = RecordPlayer();
@@ -72,25 +114,8 @@ class _PianoPageState extends State<PianoPage> {
             height: 50,
           ),
           Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-
-            FloatingActionButton.extended(
-              backgroundColor: recordButtonColor,
-              onPressed: () {
-                if(!isRecording){
-                  print("Recording");
-                  record();
-                }
-                else{
-                  stopRecording();
-                  print(recording.toJson());
-                  fsWriteRecording(recording, name: "rec");
-                }
-
-              },
-              label: const Text('Record'),
-            ),
             FloatingActionButton.extended(
               backgroundColor: playButtonColor,
               onPressed: () {
@@ -109,6 +134,28 @@ class _PianoPageState extends State<PianoPage> {
                 }
               },
               label: const Text('Play'),
+            ),
+            FloatingActionButton.extended(
+              backgroundColor: recordButtonColor,
+              onPressed: () {
+                if(!isRecording){
+                  print("Recording");
+                  record();
+                }
+                else{
+                  stopRecording();
+                  print(recording.toJson());
+                  fsWriteRecording(recording, name: "rec");
+                }
+
+              },
+              label: const Text('Record'),
+            ),
+            FloatingActionButton.extended(
+              onPressed: () {
+                _saveRecordingDialog(context);
+              },
+              label: const Text('Save'),
             ),
           ]),
             Container(
