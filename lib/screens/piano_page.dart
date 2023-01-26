@@ -76,8 +76,10 @@ class _PianoPageState extends State<PianoPage> {
           children: [
 
             FloatingActionButton.extended(
+              backgroundColor: recordButtonColor,
               onPressed: () {
                 if(!isRecording){
+                  print("Recording");
                   record();
                 }
                 else{
@@ -107,11 +109,6 @@ class _PianoPageState extends State<PianoPage> {
                 }
               },
               label: const Text('Play'),
-            ),
-            FloatingActionButton.extended(
-              onPressed: () {
-              },
-              label: const Text('Save'),
             ),
           ]),
             Container(
